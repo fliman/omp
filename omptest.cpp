@@ -19,6 +19,7 @@ int main(){
             double v = cos(i * M_PI * j /nrow);
             D[i*ncol + j] = v;
         }
+	D[i*ncol + nrow + i] = 1.0;
    }
     	
 
