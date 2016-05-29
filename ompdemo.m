@@ -65,11 +65,12 @@ r = randn(size(x));
 r = r/norm(r)*norm(x)/4;
 y = x + r;
 
-
+size(D)
+size(y)
 % perform omp %
-
-gamma = omp(D'*y, D'*D, nnz(g));
-err = x-D*gamma;
+%D' * y
+%gamma = omp(D'*y, D'*D, nnz(g));
+%err = x-D*gamma
 
 
 % show results %
