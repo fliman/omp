@@ -11,7 +11,7 @@
  * Last updated: 13.8.2009
  *
  *************************************************************************/
-
+#define SQR(X) ((X)*(X))
 
 /* find maximum of absolute values */
 template<typename type>

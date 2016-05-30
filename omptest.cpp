@@ -224,7 +224,7 @@ int main(){
 
     matrix<double> gamma(nrow, 1);
     matrix<double> DtX(ncol, 1);
-    std::vector dtx = mat_tran_vec(mat, vy);
+    std::vector<double> dtx = mat_tran_vec(mat, vy);
     memcpy(DtX.data, &dtx[0], dtx.size()*sizeof(double));
     mat_tran_mat(mat, mat, DtD);
     omp_ec(DtX, XtX, DtD, 0.01, 256, gamma);

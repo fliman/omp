@@ -92,7 +92,7 @@ type l2norm(type *data, size_t len){
 }
 
 template<typename type>
-type scale(type *data, type scl, size_t len){
+void scale(type *data, type scl, size_t len){
 	for (int i = 0; i < len; ++i)
 	{
 		data[i] *= scl;
@@ -110,5 +110,7 @@ std::vector<type> vec_plus(
 	{
 		res[i] = a[i] + b[i];
 	}
+
+	return res;
 }
 #endif

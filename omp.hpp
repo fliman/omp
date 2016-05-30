@@ -9,11 +9,11 @@
 template<typename type>
 void
 ompcore(
-	type D[], 
-	type x[], 
-	type DtX[], 
-	type XtX[], 
-	type G[], 
+	type *D,
+	type *x,
+	type *DtX, 
+	type *XtX, 
+	type *G, 
 	size_t n, 
 	size_t m, 
 	size_t L,
@@ -21,9 +21,10 @@ ompcore(
     type eps,
     size_t T,
     int erroromp,
-    type gamma[]
+    type *gamma
 ){
-  
+  	
+
   size_t i, j, signum, pos, *ind, *gammaIr, *gammaJc, gamma_count;
   size_t allocated_coefs, allocated_cols;
   size_t *selected_atoms;
@@ -32,8 +33,6 @@ ompcore(
   int mins_remain, hrs_remain;
   
  
-  
-  
   /*** status flags ***/
   
   bool DtX_specified = (DtX!=0);   /* indicates whether D'*x was provided */
@@ -83,7 +82,7 @@ ompcore(
   
   if (erroromp) {
     eps2 = eps*eps;        /* compute eps^2 */
-    if (T<0 || T>n) {      /* unspecified max atom num - set max atoms to n */
+    if (T == 0 || T>n) {      /* unspecified max atom num - set max atoms to n */
       T = n;
     }
   }
@@ -117,7 +116,7 @@ ompcore(
       /* compute DtX */
       
       if (!DtX_specified) {
-        matT_vec(1, D, x+n*signum, DtX, n, m);
+        matT_vec((double)1.0, D, x+n*signum, DtX, n, m);
       }
       
       
@@ -192,7 +191,7 @@ ompcore(
         /* incremental Cholesky decomposition: compute next row of Lchol */
         
         if (standardomp) {
-          matT_vec(1, Dsub, D+n*pos, tempvec1, n, i);      /* compute tempvec1 := Dsub'*d where d is new atom */
+          matT_vec(1.0, Dsub, D+n*pos, tempvec1, n, i);      /* compute tempvec1 := Dsub'*d where d is new atom */
         }
         else {
           vec_assign(tempvec1, Gsub+i*m, ind, i);          /* extract tempvec1 := Gsub(ind,i) */
@@ -226,14 +225,14 @@ ompcore(
       /* update alpha = D'*residual */
       
       if (standardomp) {
-        mat_vec(-1, Dsub, c, r, n, i);             /* compute r := -Dsub*c */
-        vec_sum(1, x+n*signum, r, n);              /* compute r := x+r */
+        mat_vec(-1.0, Dsub, c, r, n, i);             /* compute r := -Dsub*c */
+        vec_sum(1.0, x+n*signum, r, n);              /* compute r := x+r */
         
         
-        /*memcpy(r, x+n*signum, n*sizeof(double));   /* assign r := x */
-        /*mat_vec1(-1, Dsub, c, 1, r, n, i);         /* compute r := r-Dsub*c */
+        //memcpy(r, x+n*signum, n*sizeof(double));   /* assign r := x */
+        //mat_vec1(-1, Dsub, c, 1, r, n, i);         /* compute r := r-Dsub*c */
         
-        matT_vec(1, D, r, alpha, n, m);            /* compute alpha := D'*r */
+        matT_vec(1.0, D, r, alpha, n, m);            /* compute alpha := D'*r */
        
         /* update residual norm */
         if (erroromp) {
@@ -242,9 +241,9 @@ ompcore(
         }
       }
       else {
-        mat_vec(1, Gsub, c, tempvec1, m, i);                              /* compute tempvec1 := Gsub*c */
+        mat_vec(1.0, Gsub, c, tempvec1, m, i);                              /* compute tempvec1 := Gsub*c */
         memcpy(alpha, DtX + m*signum*DtX_specified, m*sizeof(double));    /* set alpha = D'*x */
-        vec_sum(-1, tempvec1, alpha, m);                                  /* compute alpha := alpha - tempvec1 */
+        vec_sum(-1.0, tempvec1, alpha, m);                                  /* compute alpha := alpha - tempvec1 */
         
         
         /* update residual norm */
@@ -267,11 +266,11 @@ ompcore(
       }
     //}
     // else {
-    //   /* sort the coefs by index before writing them to gamma */
+       /* sort the coefs by index before writing them to gamma */
     //   quicksort(ind,c,i);
       
       
-    //   /* gamma is full - reallocate */
+       /* gamma is full - reallocate */
     //   if (gamma_count+i >= allocated_coefs) {
         
     //     while(gamma_count+i >= allocated_coefs) {
@@ -286,7 +285,7 @@ ompcore(
     //     gammaIr = mxGetIr(Gamma);
     //   }
       
-    //   /* append coefs to gamma and update the indices */
+      /* append coefs to gamma and update the indices */
     //   for (j=0; j<i; ++j) {
     //     gammaPr[gamma_count] = c[j];
     //     gammaIr[gamma_count] = ind[j];
@@ -363,10 +362,10 @@ omp_ec(
 	}
 
 	ompcore(
-		NULL, 
-		NULL, 
+		(double*)NULL, 
+		(double*)NULL, 
 		DtX.data, 
-		&XtX[0], 
+		(type *)&XtX[0], 
 		G.data, 
 		n, 
 		m, 
@@ -376,6 +375,7 @@ omp_ec(
 		0, 
 		1,
 		gamma_ou.data);
+
 
 }
 
