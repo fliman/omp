@@ -8,13 +8,18 @@
 template<typename type>
 class matrix{
 public:
+  matrix(){data=NULL; _ncol = 0; _nrow = 0;}
   matrix(size_t nrow, size_t ncol){
     data = new type[nrow * ncol];
     _ncol = ncol;
     _nrow = nrow;
+    std::cout<<this<<"\n";
   }
   ~matrix(){
+    if(data){
     delete [] data;
+    data=NULL;
+    }
   }
   size_t _nrow;
   size_t _ncol;
@@ -24,7 +29,7 @@ public:
 };
 
 template<typename type>
-std::vector<type> mat_vec(matrix<type>mat, std::vector<type> g){
+std::vector<type> mat_vec(matrix<type> &mat, std::vector<type> g){
 	std::vector<type> res(mat._nrow, 0.0);
 
 	for(int i = 0; i < mat._nrow; i++){
@@ -38,7 +43,7 @@ std::vector<type> mat_vec(matrix<type>mat, std::vector<type> g){
 }
 
 template<typename type>
-std::vector<type> mat_tran_vec(matrix<type>mat, std::vector<type> g){
+std::vector<type> mat_tran_vec(matrix<type> &mat, std::vector<type> g){
 	std::vector<type> res(mat._ncol, 0.0);
 
 	for(int i = 0; i < mat._ncol; i++){

@@ -91,7 +91,7 @@ int main(){
        173, 101};
 
   std::cout<<"sizeof p2 "<<sizeof(p2)/sizeof(float)<<"\n";
-  
+ 
   g[20+p2[0]] = (0.1232521 * 2 - 0.5) * 1.0;
   g[20+p2[1]] = (0.9081769 * 2 - 0.5) * 1.0;    
 
@@ -227,7 +227,7 @@ int main(){
     std::vector<double> dtx = mat_tran_vec(mat, vy);
     memcpy(DtX.data, &dtx[0], dtx.size()*sizeof(double));
     mat_tran_mat(mat, mat, DtD);
-    omp_ec(DtX, XtX, DtD, 0.01, 256, gamma);
+    omp_ec(DtX.data, XtX, DtD.data, 0.01, 256, DtX._nrow, 256, DtX._ncol, gamma.data);
 
 
 }

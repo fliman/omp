@@ -63,10 +63,10 @@ ompcore(
   
   if (batchomp) {
     /* matrix containing G(:,ind) - the columns of G corresponding to the selected atoms, in order of selection */
-    Gsub = new type[m];
+    Gsub = new type[m * allocated_cols];
   }else {
     /* matrix containing D(:,ind) - the selected atoms from D, in order of selection */
-    Dsub = new type[n];
+    Dsub = new type[n * allocated_cols];
     /* stores the residual */
     r = new type[n];        
   }
@@ -262,7 +262,7 @@ ompcore(
 
     //if (gamma_mode == FULL_GAMMA) {    /* write the coefs in c to their correct positions in gamma */
       for (j=0; j<i; ++j) {
-        gammaPr[m*signum + ind[j]] = c[j];
+	gamma[m*signum + ind[j]] = c[j];
       }
     //}
     // else {
@@ -345,13 +345,20 @@ Fast version use more memory
 template<typename type>
 void
 omp_ec(
-	matrix<type> DtX, 
+       //	matrix<type> &DtX,
+        type *DtX,  
 	std::vector<type> &XtX,
-	matrix<type> G, 
+	//	matrix<type> &G,
+	type *G,
 	type epsilon,
-	size_t maxatoms, 
-	matrix<type> &gamma_ou
+	size_t maxatoms,
+	size_t m,
+	size_t n,
+	size_t L,
+	//	matrix<type> &gamma_ou
+	type *gamma_ou
 ){
+  /*
 	size_t m = DtX._nrow;
 	size_t n;
 	size_t L = DtX._ncol;
@@ -360,13 +367,13 @@ omp_ec(
 	}else {
 		n = m;
 	}
-
+  */
 	ompcore(
 		(double*)NULL, 
 		(double*)NULL, 
-		DtX.data, 
+		DtX, 
 		(type *)&XtX[0], 
-		G.data, 
+		G, 
 		n, 
 		m, 
 		L, 
@@ -374,7 +381,7 @@ omp_ec(
 		epsilon,
 		0, 
 		1,
-		gamma_ou.data);
+		gamma_ou);
 
 
 }

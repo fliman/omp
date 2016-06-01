@@ -1,8 +1,13 @@
 
+CXXFLAGS = -g -O0 
+
+omptest:omptest.o 
+	g++ $< -o $@
+
+omptest.o:omptest.cpp omp.hpp
+	g++ ${CXXFLAGS} $< -c -o $@
 
 
-omptest:omptest.cpp 
-	g++ omptest.cpp -o $@
 
 clean:
-	rm omptest
+	rm omptest *.o
