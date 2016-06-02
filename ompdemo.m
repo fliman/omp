@@ -62,17 +62,17 @@ x = D*g;
 % add gaussian noise %
 
 r = randn(size(x));
-r = r/norm(r)*norm(x)/4;
+r = r/norm(r)*norm(x)*3/4;
 y = x + r;
 
-size(D)
-size(y)
+
 % perform omp %
 %D' * y
-%gamma = omp(D'*y, D'*D, nnz(g));
-%err = x-D*gamma
+gamma = omp(D'*y, D'*D, nnz(g));
+err = x-D*gamma;
 
-
+%dump data to disk
+dump(x,y,g,gamma);
 % show results %
 
 v=[1 n -max(abs([x;y]))*1.1 max(abs([x;y]))*1.1];
@@ -86,8 +86,63 @@ figure; bar(full(gamma)); axis(v); title('Decomposition recovered by OMP');
 
 return;
 
-
+end
 % random matrix with +/-1
 function y = randsig(varargin)
 y = round(rand(varargin{:}))*2 - 1;
 return;
+end
+
+function dump(x,y, g, gamma)
+    fx=fopen('x.data', 'w');
+    [m,n]=size(x);
+    fprintf(fx, '%d %d\n', m, n);
+    %colum major
+    for i = 1:n
+        for j = 1:m
+            fprintf(fx, '%f\n', x(j,i));
+        end
+    end
+        
+    fclose(fx);
+    
+    fx=fopen('y.data', 'w');
+    [m,n]=size(y);
+    fprintf(fx, '%d %d\n', m, n);
+    %colum major
+    for i = 1:n
+        for j = 1:m
+            fprintf(fx, '%f\n', y(j,i));
+        end
+    end
+        
+    fclose(fx);
+    
+    
+    fg=fopen('g.data', 'w');
+    g=full(g);
+    [m,n]=size(g);
+    fprintf(fx, '%d %d\n', m, n);
+    %colum major
+    for i = 1:n
+        for j = 1:m
+            fprintf(fx, '%f\n', g(j,i));
+        end
+    end
+        
+    fclose(fx);
+    
+    fg=fopen('gamma.data', 'w');
+    gamma=full(gamma);
+    [m,n]=size(gamma);
+    fprintf(fx, '%d %d\n', m, n);
+    %colum major
+    for i = 1:n
+        for j = 1:m
+            fprintf(fx, '%f\n', gamma(j,i));
+        end
+    end
+        
+    fclose(fx);
+    return
+end
